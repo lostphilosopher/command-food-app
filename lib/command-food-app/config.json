@@ -1,0 +1,18 @@
+{
+    "email" : "wandersen02@gmail.com",
+    "password" : "Socrates6",
+    "payment" : {
+        "accountnumber" : "4046 4537 5007 1069",
+        "seccode" : "414",
+        "CCType" : "1",
+        "month" : "09",
+        "year" : "2016",
+        "cardname" : "WYATT R ANDERSEN",
+        "cardstreet" : "215 Oak Grove St. Apt. 1409",
+        "cardcity" : "Minneapolis",
+        "cardstate" : "MN",
+        "cardzip" : "55403",
+        "cardphone" : "218 213 2370",
+        "ConfPhone" : "218 213 2370"
+    }
+}

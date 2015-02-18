@@ -1,14 +1,10 @@
 require 'watir-webdriver'
 require 'json'
+require "./lib/command-food-app/parser.rb"
+
 
 # Parse config settings
-if !File.file?("config.json")
-    abort('Error: No config file (config.json) found.')
-end
-file = File.open("config.json", "rb")
-contents = file.read
-file.close
-config = JSON.parse(contents)
+config = Parser.new("erberts-and-gerberts", "config.json")
 
 # Validate confg settings
 if config['email'].nil?
@@ -22,21 +18,18 @@ end
 if !ARGV[0]
     puts "Using default order file: orders/default.json"  
     if File.file?("orders/default.json")
-        file = File.open("orders/default.json", "rb")
+        order = Parser.new("erberts-and-gerberts", "orders/default.json")
     else
-        abort('Error: The default order file (orders/default.json) has not been created!')
+        abort('Error: The default order file (orders/default.json) has not been created.')
     end    
 else
     if File.file?("orders/#{ARGV[0]}")
         puts "Using order file: orders/#{ARGV[0]}"
-        file = File.open("orders/#{ARGV[0]}", "rb")
+        order = Parser.new("erberts-and-gerberts", "orders/#{ARGV[0]}")
     else
-        abort("Error: File with name orders/#{ARGV[0]} does not exist!")
+        abort("Error: File with name orders/#{ARGV[0]} does not exist.")
     end
 end
-contents = file.read
-file.close
-order = JSON.parse(contents)
 
 # Validate order info
 if order['address1'].nil?
@@ -52,16 +45,13 @@ elsif order['address2'].nil?
 end
 
 # Parse the menu file
-file = File.open("menu.json", "rb")
-contents = file.read
-file.close
-menu = JSON.parse(contents)
+menu = Parser.new("erberts-and-gerberts", "menu.json")
 
 # Open browser
 @b = Watir::Browser.new :ff
 
 # Go to Erberts and Gerberts Login page
-@b.goto "https://erbertandgerberts-delivery-1088.patronpath.com/bbLogIn.php"
+@b.goto menu['pages']['login']
 
 # Login
 @b.text_field(:name => 'Email').set config['email']
@@ -289,7 +279,7 @@ puts "Total: $#{total}"
 # If desired, allow the user to enter their payment info as well
 if order['allow payment'] && config['payment']
     # Check for Erberts and Gerberts errors
-    if !@b.td(:class, 'contenterror').text.nil?
+    if @b.td(:class, 'contenterror').exists?
         abort('Error: Their are errors on the page.')
     end
     @b.button(:title => 'Continue').click
